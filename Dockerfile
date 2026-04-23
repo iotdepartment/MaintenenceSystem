@@ -8,7 +8,7 @@ ENV ASPNETCORE_URLS=http://+:8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar el resto del código fuentes
+# Copiar el resto del código fuente
 COPY . .
 
 # Publicar en modo Release
@@ -22,4 +22,4 @@ COPY --from=build /app/publish .
 # Cadena de conexión como variable de entorno
 ENV ConnectionStrings__DefaultConnection="Server=10.195.10.166,1433;Database=Mantenimiento;User Id=Manu;Password=2022.Tgram2;TrustServerCertificate=True;"
 
-ENTRYPOINT ["dotnet", "MaintenanceSystem.dll"]
+ENTRYPOINT ["dotnet", "MaintenenceSystem.dll"]
