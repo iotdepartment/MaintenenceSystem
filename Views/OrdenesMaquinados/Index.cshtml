@@ -1,0 +1,160 @@
+﻿@model IEnumerable<MaintenenceSystem.Models.OrdenesMaquinados>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+<div class="row">
+    <div class="col-4">
+        <div class="card mx-auto text-center shadow-lg border-0 rounded-pill p-3 mt-2">
+            <h4 class="m-0 fw-bold text-primary"><i class="bi bi-card-list">  </i>Status de Ordenes de Maquinados</h4>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="card mb-4 mt-3 p-4 rounded-3 shadow-lg">
+        <div class="row mt-2">
+            <div class="col-12">
+                <button class="btn btn-success mb-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#CreateOrdenModal">
+                    <i class="bi bi-plus-circle"></i>
+                    Nueva Orden
+                </button>
+            </div>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row dt-row mt-3">
+                <div class="table-responsive col-sm-12">
+                    <table id="Main" class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Folio</th>
+                                <th>Requisitor</th>
+                                <th>Fecha Solicitud</th>
+                                <th>Area</th>
+                                <th>Tipo</th>
+                                <th>Prioridad</th>
+                                <th>Cantidad</th>
+                                <th>Responsable</th>
+                                <th>Descripcion</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Folio</td>
+                                    <td>@item.Requisitor (@item.NumeroEmpleado)</td>
+                                    <td>@item.FechaInicio?.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.Area</td>
+                                    <td>@item.Tipo</td>
+                                    <td>@item.Prioridad</td>
+                                    <td>@item.Cantidad</td>
+                                    <td>@item.Responsable</td>
+                                    <td>@item.Descripcion</td>
+                                    <td>@item.Status</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+        else
+        {
+            <p>No hay ordenes registradas.</p>
+        }
+    </div>
+</div>
+@await Html.PartialAsync("_CreateOrdenModal", new MaintenenceSystem.Models.OrdenesMaquinados())
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#Main').DataTable({
+                pageLength: 10,
+                order: [],
+                responsive: true,
+                autoWidth: false,
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+                }
+            });
+
+        });
+
+    </script>
+
+    <script>
+        var modal = document.getElementById('CreateOrdenModal');
+        modal.addEventListener('shown.bs.modal', function () {
+
+                var inputNumero = document.getElementById("NumeroEmpleado");
+                var inputRequisitor = document.getElementById("Requisitor");
+                var descripcion = document.getElementById("Descripcion");
+
+                // Limitar a 4 dígitos
+                inputNumero.addEventListener("input", function () {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    if (this.value.length > 4) {
+                        this.value = this.value.slice(0, 4);
+                    }
+                });
+
+                // Buscar empleado
+                inputNumero.addEventListener("input", function () {
+                    var numero = this.value.trim();
+
+                    if (numero === "") {
+                        inputRequisitor.value = "";
+                        return;
+                    }
+
+                    fetch(`/OrdenesMaquinados/ObtenerEmpleado?numero=${numero}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                inputRequisitor.value = data.nombre;
+                            } else {
+                                inputRequisitor.value = "";
+                            }
+                        });
+                });
+        });
+
+        var modal = document.getElementById('CreateOrdenModal');
+        modal.addEventListener('shown.bs.modal', function () {
+
+            var descripcion = document.getElementById("Descripcion");
+            var contador = document.getElementById("DescripcionCount");
+
+            descripcion.addEventListener("input", function () {
+
+                // Limitar a 350 caracteres
+                if (this.value.length > 350) {
+                    this.value = this.value.slice(0, 350);
+                }
+
+                // Primera letra mayúscula, resto minúsculas
+                let texto = this.value;
+                if (texto.length > 0) {
+                    this.value = texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+                }
+
+                // Auto‑resize
+                this.style.height = "auto";
+                this.style.height = this.scrollHeight + "px";
+
+                // Actualizar contador
+                contador.textContent = this.value.length + " / 350";
+            });
+
+        });
+    </script>
+}

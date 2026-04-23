@@ -1,0 +1,93 @@
+﻿@model MaintenenceSystem.Models.OrdenesMaquinados
+
+<div class="modal fade" id="CreateOrdenModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+
+            <div class="modal-header bg-primary text-white rounded-top-4">
+                <h5 class="modal-title fw-bold"> <i class="bi bi-hammer"></i> Nueva Orden de Maquinado </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="CreateOrdenForm" method="post" asp-controller="OrdenesMaquinados" asp-action="Create">
+                @Html.AntiForgeryToken()
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card p-4">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Número empleado:</label>
+                                    <input type="text" id="NumeroEmpleado" name="NumeroEmpleado"
+                                           class="form-control form-control-lg" required />
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Requisitor:</label>
+                                    <input type="text" id="Requisitor" name="Requisitor" class="form-control form-control-lg bg-light text-secondary" readonly required />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card p-4">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Cantidad:</label>
+                                    <input type="number" name="Cantidad" class="form-control form-control-lg" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Tipo:</label>
+                                    <select name="Tipo" class="form-select form-select-lg" required>
+                                        <option value="">-- Seleccionar --</option>
+                                        <option value="Fabricación">Fabricación</option>
+                                        <option value="Retrabajo">Retrabajo</option>
+                                        <option value="Modificación">Modificación</option>
+                                        <option value="Otros">Otros</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Prioridad:</label>
+                                    <select name="Prioridad" class="form-select form-select-lg" required>
+                                        <option value="">-- Seleccionar --</option>
+                                        <option value="Seguridad">Seguridad</option>
+                                        <option value="Calidad">Calidad</option>
+                                        <option value="Productividad">Productividad</option>
+                                        <option value="Mejora Kaizen">Mejora Kaizen</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Área:</label>
+                                    <select name="Area" class="form-select form-select-lg" required>
+                                        <option value="">-- Seleccionar --</option>
+                                        @foreach (var area in ViewBag.Areas)
+                                        {
+                                            <option value="@area.Area">@area.Area</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Descripción:</label>
+                                <textarea id="Descripcion" name="Descripcion"
+                                          class="form-control form-control-lg"
+                                          rows="2" required></textarea>
+                                <small id="DescripcionCount" class="text-muted">0 / 350</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success btn-lg px-4 rounded-pill">Generar Orden</button>
+                    <button type="button" class="btn btn-secondary btn-lg px-4 rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
