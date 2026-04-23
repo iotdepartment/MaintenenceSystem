@@ -1,14 +1,14 @@
-# Etapa base para ejecuci髇
+# Etapa base para ejecuci贸n
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
 
-# Etapa de compilaci髇
+# Etapa de compilaci贸n
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar el resto del c骴igo fuentes
+# Copiar el resto del c贸digo fuentes
 COPY . .
 
 # Publicar en modo Release
@@ -19,7 +19,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Cadena de conexi髇 como variable de entorno
+# Cadena de conexi贸n como variable de entorno
 ENV ConnectionStrings__DefaultConnection="Server=10.195.10.166,1433;Database=Mantenimiento;User Id=Manu;Password=2022.Tgram2;TrustServerCertificate=True;"
 
 ENTRYPOINT ["dotnet", "MaintenanceSystem.dll"]
