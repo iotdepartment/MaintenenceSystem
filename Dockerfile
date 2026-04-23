@@ -8,7 +8,7 @@ ENV ASPNETCORE_URLS=http://+:8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copiar el resto del código fuente
+# Copiar el resto del código fuentes
 COPY . .
 
 # Publicar en modo Release
