@@ -12,7 +12,7 @@ WORKDIR /src
 COPY . .
 
 # Publicar en modo Release
-RUN dotnet publish "MaintenanceSystem.csproj" -c Release -o /app/publish --verbosity detailed
+RUN dotnet publish "MaintenenceSystem.csproj" -c Release -o /app/publish
 
 # Etapa final: imagen optimizada
 FROM base AS final
