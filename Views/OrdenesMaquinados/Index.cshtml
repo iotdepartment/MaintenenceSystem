@@ -31,11 +31,12 @@
                                 <th>Folio</th>
                                 <th>Requisitor</th>
                                 <th>Fecha Solicitud</th>
+                                <th>Fecha Aceptacion</th>
+                                <th>Fecha Entrega</th>
                                 <th>Area</th>
                                 <th>Tipo</th>
                                 <th>Prioridad</th>
                                 <th>Cantidad</th>
-                                <th>Responsable</th>
                                 <th>Descripcion</th>
                                 <th>Status</th>
                             </tr>
@@ -47,11 +48,12 @@
                                     <td>@item.Folio</td>
                                     <td>@item.Requisitor (@item.NumeroEmpleado)</td>
                                     <td>@item.FechaInicio?.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.FechaAceptacion?.ToString("dd/MM/yyyy")</td>
+                                    <td>@item.FechaEntrega?.ToString("dd/MM/yyyy")</td>
                                     <td>@item.Area</td>
                                     <td>@item.Tipo</td>
                                     <td>@item.Prioridad</td>
                                     <td>@item.Cantidad</td>
-                                    <td>@item.Responsable</td>
                                     <td>@item.Descripcion</td>
                                     <td>@item.Status</td>
                                 </tr>

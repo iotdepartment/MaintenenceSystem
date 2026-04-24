@@ -27,9 +27,9 @@
                                 <th>Tipo</th>
                                 <th>Prioridad</th>
                                 <th>Cantidad</th>
-                                <th>Responsable</th>
                                 <th>Descripcion</th>
                                 <th>Status</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,9 +43,54 @@
                                     <td>@item.Tipo</td>
                                     <td>@item.Prioridad</td>
                                     <td>@item.Cantidad</td>
-                                    <td>@item.Responsable</td>
                                     <td>@item.Descripcion</td>
                                     <td>@item.Status</td>
+                                    <td>
+                                        @if (item.Status == "Pendiente")
+                                        {
+                                            <button class="btn btn-primary btn-sm rounded-pill"
+                                                    onclick="abrirModalTomar(@item.ID)">
+                                                Tomar
+                                            </button>
+                                        }
+                                        else if (item.Status == "En proceso")
+                                        {
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-success btn-sm rounded-pill"
+                                                        onclick="abrirModalCerrar(@item.ID)">
+                                                    Cerrar
+                                                </button>
+
+                                                <button class="btn btn-warning btn-sm text-dark rounded-pill"
+                                                        onclick="abrirModalPausar(@item.ID)">
+                                                    Pausar
+                                                </button>
+
+                                                <button class="btn btn-danger btn-sm rounded-pill"
+                                                        onclick="abrirModalCancelar(@item.ID)">
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        }
+                                        else if (item.Status == "Pausada")
+                                        {
+                                            <div class="d-flex gap-2">
+                                                <button class="btn btn-primary btn-sm rounded-pill"
+                                                        onclick="abrirModalReanudar(@item.ID)">
+                                                    Reanudar
+                                                </button>
+
+                                                <button class="btn btn-danger btn-sm rounded-pill"
+                                                        onclick="abrirModalCancelar(@item.ID)">
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sin acciones</span>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -57,6 +102,118 @@
         {
             <p>No hay ordenes registradas.</p>
         }
+    </div>
+</div>
+
+<div class="modal fade" id="ModalReanudarOrden" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Reanudar orden</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>¿Deseas reanudar esta orden y cambiar su estatus a <strong>En proceso</strong>?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnConfirmarReanudar">Confirmar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalTomarOrden" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Confirmar acción</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>¿Deseas tomar esta orden y cambiar su estatus a <strong>En proceso</strong>?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary rounded-pill" id="btnConfirmarTomar">Confirmar</button>
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalPausarOrden" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">Pausar orden</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>¿Deseas pausar esta orden y cambiar su estatus a <strong>Pausada</strong>?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning rounded-pill" id="btnConfirmarPausar">Confirmar</button>
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalCancelarOrden" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Cancelar orden</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>¿Deseas cancelar esta orden y cambiar su estatus a <strong>Cancelada</strong>?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger rounded-pill" id="btnConfirmarCancelar">Confirmar</button>
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+    
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ModalCerrarOrden" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Cerrar orden</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>¿Deseas cerrar esta orden y cambiar su estatus a <strong>Cerrada</strong>?</p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success rounded-pill" id="btnConfirmarCerrar">Confirmar</button>
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+
+        </div>
     </div>
 </div>
 
@@ -79,6 +236,120 @@
             });
 
         });
+    </script>
 
+    <script>
+        let ordenIdReanudar = 0;
+
+        function abrirModalReanudar(id) {
+            ordenIdReanudar = id;
+
+            var modal = new bootstrap.Modal(document.getElementById('ModalReanudarOrden'));
+            modal.show();
+        }
+
+        document.getElementById("btnConfirmarReanudar").addEventListener("click", function () {
+
+            fetch(`/OrdenesMaquinados/ReanudarOrden/${ordenIdReanudar}`, {
+                method: "POST"
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        let ordenIdSeleccionada = 0;
+
+        function abrirModalTomar(id) {
+            ordenIdSeleccionada = id;
+
+            var modal = new bootstrap.Modal(document.getElementById('ModalTomarOrden'));
+            modal.show();
+        }
+
+        document.getElementById("btnConfirmarTomar").addEventListener("click", function () {
+
+            fetch(`/OrdenesMaquinados/TomarOrden/${ordenIdSeleccionada}`, {
+                method: "POST"
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        let ordenIdPausar = 0;
+
+        function abrirModalPausar(id) {
+            ordenIdPausar = id;
+
+            var modal = new bootstrap.Modal(document.getElementById('ModalPausarOrden'));
+            modal.show();
+        }
+
+        document.getElementById("btnConfirmarPausar").addEventListener("click", function () {
+
+            fetch(`/OrdenesMaquinados/PausarOrden/${ordenIdPausar}`, {
+                method: "POST"
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        let ordenIdCancelar = 0;
+
+        function abrirModalCancelar(id) {
+            ordenIdCancelar = id;
+
+            var modal = new bootstrap.Modal(document.getElementById('ModalCancelarOrden'));
+            modal.show();
+        }
+
+        document.getElementById("btnConfirmarCancelar").addEventListener("click", function () {
+
+            fetch(`/OrdenesMaquinados/CancelarOrden/${ordenIdCancelar}`, {
+                method: "POST"
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        });
+    </script>
+
+    <script>
+        let ordenIdCerrar = 0;
+
+        function abrirModalCerrar(id) {
+            ordenIdCerrar = id;
+
+            var modal = new bootstrap.Modal(document.getElementById('ModalCerrarOrden'));
+            modal.show();
+        }
+
+        document.getElementById("btnConfirmarCerrar").addEventListener("click", function () {
+
+            fetch(`/OrdenesMaquinados/CerrarOrden/${ordenIdCerrar}`, {
+                method: "POST"
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+        });
     </script>
 }

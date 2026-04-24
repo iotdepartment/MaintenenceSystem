@@ -61,6 +61,83 @@ namespace MaintenenceSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost]
+        public IActionResult TomarOrden(int id)
+        {
+            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == id);
+
+            if (orden == null)
+                return NotFound();
+
+            orden.Status = "En proceso";
+            orden.FechaAceptacion = DateTime.Now;
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public IActionResult PausarOrden(int id)
+        {
+            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == id);
+
+            if (orden == null)
+                return NotFound();
+
+            orden.Status = "Pausada";
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public IActionResult CancelarOrden(int id)
+        {
+            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == id);
+
+            if (orden == null)
+                return NotFound();
+
+            orden.Status = "Cancelada";
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public IActionResult CerrarOrden(int id)
+        {
+            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == id);
+
+            if (orden == null)
+                return NotFound();
+
+            orden.Status = "Cerrada";
+            orden.FechaEntrega = DateTime.Now;
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public IActionResult ReanudarOrden(int id)
+        {
+            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == id);
+
+            if (orden == null)
+                return NotFound();
+
+            orden.Status = "En proceso";
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
         [HttpGet]
         public IActionResult ObtenerEmpleado(int numero)
         {
