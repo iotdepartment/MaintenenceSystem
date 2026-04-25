@@ -6,7 +6,7 @@
     <title>@ViewData["Title"] - TGRMX Maintenence System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/TrainingsDashboard.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MaintenenceSystem.styles.css" asp-append-version="true" />
     <link rel="icon" type="image/png" href="~/Images/Logo.png" />
 </head>
 <body>
@@ -24,15 +24,15 @@
         </nav>
     </header>
 
-    <div class="container-fluid p-5 bg-body-secondary flex-grow-1">
-        <main role="main" class="pb-3">
+    <div class="container-fluid p-5 bg-body-secondary">
+        <main role="main" class="pb-0">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="footer bg-secondary text-muted text-center py-2">
-        <div class="container-fluid text-light">
-            © TGRMX Iot Department 2026 (Ver. 0.42126)
+    <footer class="footer bg-body-secondary text-muted text-center">
+        <div class="container-fluid text-black fw-bold">
+            © TGRMX Iot Department 2026 (Ver. 0.42526)
         </div>
     </footer>
 

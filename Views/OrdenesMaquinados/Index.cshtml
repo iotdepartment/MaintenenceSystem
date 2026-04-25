@@ -3,10 +3,11 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 
+
 <div class="row">
     <div class="col-4">
-        <div class="card mx-auto text-center shadow-lg border-0 rounded-pill p-3 mt-2">
-            <h4 class="m-0 fw-bold text-primary"><i class="bi bi-card-list">  </i>Status de Ordenes de Maquinados</h4>
+        <div class="card mx-auto text-center shadow-lg bg-secondary border-0 rounded rounded-pill p-2">
+            <h3 class="m-0 fw-bold text-light"><i class="bi bi-card-list">  </i>Status de Ordenes de Maquinados</h3>
         </div>
     </div>
 </div>
@@ -44,8 +45,14 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                <tr>
-                                    <td>@item.Folio</td>
+                                <tr class="
+                                        @(item.Status == "Pendiente" ? "table-secondary" : "")
+                                        @(item.Status == "En proceso" ? "table-primary" : "")
+                                        @(item.Status == "Pausada" ? "table-warning" : "")
+                                        @(item.Status == "Cancelada" ? "table-danger" : "")
+                                        @(item.Status == "Cerrada" ? "table-success" : "")
+                                    ">
+                                    <td class="fw-bolder">@item.Folio</td>
                                     <td>@item.Requisitor (@item.NumeroEmpleado)</td>
                                     <td>@item.FechaInicio?.ToString("dd/MM/yyyy")</td>
                                     <td>@item.FechaAceptacion?.ToString("dd/MM/yyyy")</td>
@@ -55,7 +62,38 @@
                                     <td>@item.Prioridad</td>
                                     <td>@item.Cantidad</td>
                                     <td>@item.Descripcion</td>
-                                    <td>@item.Status</td>
+                                    <td>
+                                        @if (item.Status == "Pendiente")
+                                        {
+                                            <span class="badge bg-secondary fs-6">
+                                                ⏳ Pendiente
+                                            </span>
+                                        }
+                                        else if (item.Status == "En proceso")
+                                        {
+                                            <span class="badge bg-primary fs-6">
+                                                🔧 En proceso
+                                            </span>
+                                        }
+                                        else if (item.Status == "Pausada")
+                                        {
+                                            <span class="badge bg-warning text-dark fs-6">
+                                                ⏸️ Pausada
+                                            </span>
+                                        }
+                                        else if (item.Status == "Cancelada")
+                                        {
+                                            <span class="badge bg-danger fs-6">
+                                                ❌ Cancelada
+                                            </span>
+                                        }
+                                        else if (item.Status == "Cerrada")
+                                        {
+                                            <span class="badge bg-success fs-6">
+                                                ✔️ Cerrada
+                                            </span>
+                                        }
+                                    </td>
                                 </tr>
                             }
                         </tbody>
@@ -69,6 +107,19 @@
         }
     </div>
 </div>
+
+<div class="position-fixed bottom-0 end-0 p-4" style="z-index: 9999">
+    <div id="OrdenCreadaToast" class="toast text-white bg-success border-0 fade" role="alert" data-bs-delay="3500">
+        <div class="d-flex align-items-center">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <span style="font-size: 1.5rem;">✔️</span>
+                <span>Orden creada correctamente</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
 @await Html.PartialAsync("_CreateOrdenModal", new MaintenenceSystem.Models.OrdenesMaquinados())
 
 @section Scripts {
@@ -90,73 +141,119 @@
             });
 
         });
-
     </script>
 
     <script>
-        var modal = document.getElementById('CreateOrdenModal');
+
+                var modal = document.getElementById('CreateOrdenModal');
+
         modal.addEventListener('shown.bs.modal', function () {
 
-                var inputNumero = document.getElementById("NumeroEmpleado");
-                var inputRequisitor = document.getElementById("Requisitor");
-                var descripcion = document.getElementById("Descripcion");
+            var inputNumero = document.getElementById("NumeroEmpleado");
+            var inputRequisitor = document.getElementById("Requisitor");
+            var btnGenerar = document.getElementById("btnGenerarOrden");
+            var errorMsg = document.getElementById("NumeroEmpleadoError");
 
-                // Limitar a 4 dígitos
-                inputNumero.addEventListener("input", function () {
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                    if (this.value.length > 4) {
-                        this.value = this.value.slice(0, 4);
-                    }
-                });
+            btnGenerar.disabled = true;
 
-                // Buscar empleado
-                inputNumero.addEventListener("input", function () {
-                    var numero = this.value.trim();
+            inputNumero.addEventListener("input", function () {
 
-                    if (numero === "") {
-                        inputRequisitor.value = "";
-                        return;
-                    }
+                // Solo permitir números
+                this.value = this.value.replace(/[^0-9]/g, '');
 
-                    fetch(`/OrdenesMaquinados/ObtenerEmpleado?numero=${numero}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                inputRequisitor.value = data.nombre;
-                            } else {
-                                inputRequisitor.value = "";
-                            }
-                        });
-                });
-        });
-
-        var modal = document.getElementById('CreateOrdenModal');
-        modal.addEventListener('shown.bs.modal', function () {
-
-            var descripcion = document.getElementById("Descripcion");
-            var contador = document.getElementById("DescripcionCount");
-
-            descripcion.addEventListener("input", function () {
-
-                // Limitar a 350 caracteres
-                if (this.value.length > 350) {
-                    this.value = this.value.slice(0, 350);
+                // Limitar a 5 dígitos
+                if (this.value.length > 5) {
+                    this.value = this.value.slice(0, 5);
                 }
 
-                // Primera letra mayúscula, resto minúsculas
-                let texto = this.value;
-                if (texto.length > 0) {
-                    this.value = texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+                var numero = this.value.trim();
+
+                // Si está vacío → inválido
+                if (numero.length === 0) {
+                    inputRequisitor.value = "";
+                    btnGenerar.disabled = true;
+                    inputNumero.classList.remove("is-valid");
+                    inputNumero.classList.add("is-invalid");
+                    errorMsg.classList.remove("d-none");
+                    errorMsg.textContent = "Ingrese un número de empleado";
+                    return;
                 }
 
-                // Auto‑resize
-                this.style.height = "auto";
-                this.style.height = this.scrollHeight + "px";
+                // Buscar empleado desde 1 dígito
+                fetch(`/OrdenesMaquinados/ObtenerEmpleado?numero=${numero}`)
+                    .then(response => response.json())
+                    .then(data => {
 
-                // Actualizar contador
-                contador.textContent = this.value.length + " / 350";
+                        if (data.success) {
+                            inputRequisitor.value = data.nombre;
+
+                            inputNumero.classList.remove("is-invalid");
+                            inputNumero.classList.add("is-valid");
+                            errorMsg.classList.add("d-none");
+
+                            btnGenerar.disabled = false;
+
+                        } else {
+                            inputRequisitor.value = "";
+
+                            inputNumero.classList.remove("is-valid");
+                            inputNumero.classList.add("is-invalid");
+                            errorMsg.classList.remove("d-none");
+                            errorMsg.textContent = "Empleado no encontrado";
+
+                            btnGenerar.disabled = true;
+                        }
+                    });
             });
 
+        });
+
+
+        // ================================
+        // VALIDACIÓN DE DESCRIPCIÓN
+        // ================================
+        var descripcion = document.getElementById("Descripcion");
+        var contador = document.getElementById("DescripcionCount");
+
+        descripcion.addEventListener("input", function () {
+
+            // Limitar a 350 caracteres
+            if (this.value.length > 350) {
+                this.value = this.value.slice(0, 350);
+            }
+
+            // Primera letra mayúscula, resto minúsculas
+            let texto = this.value;
+            if (texto.length > 0) {
+                this.value = texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase();
+            }
+
+            // Auto‑resize
+            this.style.height = "auto";
+            this.style.height = this.scrollHeight + "px";
+
+            // Actualizar contador
+            contador.textContent = this.value.length + " / 350";
+        });
+
+    </script>
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <script>
+        var modal = new bootstrap.Modal(document.getElementById('CreateOrdenModal'));
+        modal.show();
+    </script>
+}
+
+@if (TempData["OrdenCreada"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var toastEl = document.getElementById('OrdenCreadaToast');
+            var toast = new bootstrap.Toast(toastEl);
+            toast.show();
         });
     </script>
 }

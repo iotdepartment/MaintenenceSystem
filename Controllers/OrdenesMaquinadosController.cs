@@ -28,6 +28,22 @@ namespace MaintenenceSystem.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(OrdenesMaquinados orden)
         {
+            // Validar que el número de empleado exista en la base de datos
+            var empleado = _context.Empleados
+                .FirstOrDefault(e => e.NumeroEmpleado == orden.NumeroEmpleado);
+
+            if (empleado == null)
+            {
+                ModelState.AddModelError("NumeroEmpleado", "El número de empleado no existe.");
+
+                // Recargar datos necesarios para la vista
+                ViewBag.Areas = _context.Areas.ToList();
+
+                // Regresar a Index con la lista de órdenes
+                return View("Index", _context.OrdenesMaquinados.ToList());
+            }
+
+            // Validación general del modelo
             if (!ModelState.IsValid)
             {
                 ViewBag.Areas = _context.Areas.ToList();
@@ -57,10 +73,10 @@ namespace MaintenenceSystem.Controllers
 
             _context.OrdenesMaquinados.Add(orden);
             _context.SaveChanges();
+            TempData["OrdenCreada"] = true;
 
             return RedirectToAction(nameof(Index));
         }
-
         [HttpPost]
         public IActionResult TomarOrden(int id)
         {

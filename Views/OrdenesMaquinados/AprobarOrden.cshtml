@@ -5,8 +5,8 @@
 
 <div class="row">
     <div class="col-4">
-        <div class="card mx-auto text-center shadow-lg border-0 rounded-pill p-3 mt-2">
-            <h4 class="m-0 fw-bold text-primary"><i class="bi bi-clipboard2-check"></i> Aprobar Ordenes de Maquinados</h4>
+        <div class="card mx-auto text-center shadow-lg bg-secondary border-0 rounded rounded-pill p-2">
+            <h3 class="m-0 fw-bold text-light"><i class="bi bi-clipboard2-check"></i> Gestionar Ordenes de Maquinados</h3>
         </div>
     </div>
 </div>
@@ -35,8 +35,14 @@
                         <tbody>
                             @foreach (var item in Model)
                             {
-                                <tr>
-                                    <td>@item.Folio</td>
+                                <tr class="
+                                        @(item.Status == "Pendiente" ? "table-secondary" : "")
+                                        @(item.Status == "En proceso" ? "table-primary" : "")
+                                        @(item.Status == "Pausada" ? "table-warning" : "")
+                                        @(item.Status == "Cancelada" ? "table-danger" : "")
+                                        @(item.Status == "Cerrada" ? "table-success" : "")
+                                    ">
+                                    <td class="fw-bold">@item.Folio</td>
                                     <td>@item.Requisitor (@item.NumeroEmpleado)</td>
                                     <td>@item.FechaInicio?.ToString("dd/MM/yyyy")</td>
                                     <td>@item.Area</td>
@@ -44,7 +50,28 @@
                                     <td>@item.Prioridad</td>
                                     <td>@item.Cantidad</td>
                                     <td>@item.Descripcion</td>
-                                    <td>@item.Status</td>
+                                    <td>
+                                        @if (item.Status == "Pendiente")
+                                        {
+                                            <span class="badge bg-secondary">Pendiente</span>
+                                        }
+                                        else if (item.Status == "En proceso")
+                                        {
+                                            <span class="badge bg-primary">En proceso</span>
+                                        }
+                                        else if (item.Status == "Pausada")
+                                        {
+                                            <span class="badge bg-warning text-dark">Pausada</span>
+                                        }
+                                        else if (item.Status == "Cancelada")
+                                        {
+                                            <span class="badge bg-danger">Cancelada</span>
+                                        }
+                                        else if (item.Status == "Cerrada")
+                                        {
+                                            <span class="badge bg-success">Cerrada</span>
+                                        }
+                                    </td>
                                     <td>
                                         @if (item.Status == "Pendiente")
                                         {

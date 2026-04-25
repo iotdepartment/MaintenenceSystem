@@ -18,9 +18,19 @@
                         <div class="col-6">
                             <div class="card p-4">
                                 <div class="mb-3">
-                                    <label class="form-label fw-semibold">Número empleado:</label>
-                                    <input type="text" id="NumeroEmpleado" name="NumeroEmpleado"
-                                           class="form-control form-control-lg" required />
+                                    <label class="form-label fw-semibold">Número de empleado</label>
+
+                                    <input id="NumeroEmpleado" name="NumeroEmpleado" class="form-control" />
+
+                                    <!-- Mensaje dinámico -->
+                                    <small id="NumeroEmpleadoError" class="text-danger d-none">
+                                        Empleado no encontrado
+                                    </small>
+
+                                    <!-- Mensaje del backend -->
+                                    <span class="text-danger">
+                                        @Html.ValidationMessageFor(m => m.NumeroEmpleado)
+                                    </span>
                                 </div>
 
                                 <div class="mb-3">
@@ -83,7 +93,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success btn-lg px-4 rounded-pill">Generar Orden</button>
+                    <button id="btnGenerarOrden" type="submit" class="btn btn-success btn-lg px-4 rounded-pill">Generar Orden</button>
                     <button type="button" class="btn btn-secondary btn-lg px-4 rounded-pill" data-bs-dismiss="modal">Cancelar</button>
                 </div>
 
