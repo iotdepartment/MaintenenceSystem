@@ -89,6 +89,7 @@ namespace MaintenenceSystem.Controllers
             orden.FechaAceptacion = DateTime.Now;
 
             _context.SaveChanges();
+            TempData["OrdenTomada"] = true;
 
             return Ok();
         }
@@ -104,23 +105,89 @@ namespace MaintenenceSystem.Controllers
             orden.Status = "Pausada";
 
             _context.SaveChanges();
+            TempData["OrdenPausada"] = true;
 
             return Ok();
         }
 
         [HttpPost]
-        public IActionResult CancelarOrden(int id)
+        public IActionResult PausarConComentario([FromBody] ComentarioPausaRequest req)
         {
-            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == id);
+            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == req.Id);
 
             if (orden == null)
-                return NotFound();
+                return Json(new { success = false });
 
+            // Crear comentario con solo la fecha
+            string fecha = DateTime.Now.ToString("dd/MM/yyyy");
+            string comentarioConFecha = $"({fecha}) {req.Comentario}";
+
+            // Guardar comentario concatenado
+            if (!string.IsNullOrEmpty(orden.Comentarios))
+                orden.Comentarios += " / " + comentarioConFecha;
+            else
+                orden.Comentarios = comentarioConFecha;
+
+            // Cambiar estatus
+            orden.Status = "Pausada";
+
+            _context.SaveChanges();
+
+            return Json(new { success = true });
+        }
+
+        public class ComentarioPausaRequest
+        {
+            public int Id { get; set; }
+            public string Comentario { get; set; }
+        }
+
+        //[HttpPost]
+        //public IActionResult CancelarOrden(int id)
+        //{
+        //    var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == id);
+
+        //    if (orden == null)
+        //        return NotFound();
+
+        //    orden.Status = "Cancelada";
+
+        //    _context.SaveChanges();
+        //    TempData["OrdenCancelada"] = true;
+
+        //    return Ok();
+        //}
+
+        [HttpPost]
+        public IActionResult CancelarOrden([FromBody] ComentarioCancelarRequest req)
+        {
+            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == req.Id);
+
+            if (orden == null)
+                return Json(new { success = false });
+
+            // Crear comentario con solo la fecha
+            string fecha = DateTime.Now.ToString("dd/MM/yyyy");
+            string comentarioConFecha = $"({fecha}) {req.Comentario}";
+
+            // Guardar comentario concatenado
+            if (!string.IsNullOrEmpty(orden.Comentarios))
+                orden.Comentarios += " / " + comentarioConFecha;
+            else
+                orden.Comentarios = comentarioConFecha;
+
+            // Cambiar estatus
             orden.Status = "Cancelada";
 
             _context.SaveChanges();
 
-            return Ok();
+            return Json(new { success = true });
+        }
+
+        public class ComentarioCancelarRequest
+        {
+            public int Id { get; set; }
+            public string Comentario { get; set; }
         }
 
         [HttpPost]
@@ -135,6 +202,7 @@ namespace MaintenenceSystem.Controllers
             orden.FechaEntrega = DateTime.Now;
 
             _context.SaveChanges();
+            TempData["OrdenCerrada"] = true;
 
             return Ok();
         }
@@ -168,6 +236,45 @@ namespace MaintenenceSystem.Controllers
                 success = true,
                 nombre = empleado.NombreEmpleado
             });
+        }
+
+        [HttpPost]
+        public IActionResult GuardarComentario([FromBody] ComentarioRequest req)
+        {
+            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == req.Id);
+
+            if (orden == null)
+                return Json(new { success = false });
+
+            // Crear comentario con solo la fecha
+            string fecha = DateTime.Now.ToString("dd/MM/yyyy");
+            string comentarioConFecha = $"({fecha}) {req.Comentario}";
+
+            // Guardar comentario concatenado
+            if (!string.IsNullOrEmpty(orden.Comentarios))
+                orden.Comentarios += " / " + comentarioConFecha;
+            else
+                orden.Comentarios = comentarioConFecha;
+
+            _context.SaveChanges();
+
+            return Json(new { success = true });
+        }
+
+        public class ComentarioRequest
+        {
+            public int Id { get; set; }
+            public string Comentario { get; set; }
+        }
+
+        public IActionResult HistorialComentarios(int id)
+        {
+            var orden = _context.OrdenesMaquinados.FirstOrDefault(o => o.ID == id);
+
+            if (orden == null)
+                return Content("No se encontró la orden");
+
+            return PartialView("_HistorialComentarios", orden);
         }
     }
 }

@@ -97,6 +97,11 @@
                                                         onclick="abrirModalCancelar(@item.ID)">
                                                     Cancelar
                                                 </button>
+
+                                                <button class="btn btn-secondary btn-sm rounded-pill"
+                                                        onclick="abrirModalComentarios(@item.ID)">
+                                                    Comentarios
+                                                </button>
                                             </div>
                                         }
                                         else if (item.Status == "Pausada")
@@ -110,6 +115,11 @@
                                                 <button class="btn btn-danger btn-sm rounded-pill"
                                                         onclick="abrirModalCancelar(@item.ID)">
                                                     Cancelar
+                                                </button>
+
+                                                <button class="btn btn-secondary btn-sm rounded-pill"
+                                                        onclick="abrirModalComentarios(@item.ID)">
+                                                    Comentarios
                                                 </button>
                                             </div>
                                         }
@@ -129,6 +139,18 @@
         {
             <p>No hay ordenes registradas.</p>
         }
+    </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-4" style="z-index: 9999">
+    <div id="OrdenToast" class="toast text-white toast-slide bg-success border-0 fade" role="alert" data-bs-delay="3500">
+        <div class="d-flex align-items-center">
+            <div class="toast-body d-flex align-items-center gap-2">
+                <span id="ToastIcon" style="font-size: 1.5rem;">✔️</span>
+                <span id="ToastMensaje">Mensaje</span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
     </div>
 </div>
 
@@ -187,11 +209,24 @@
             </div>
 
             <div class="modal-body">
+
                 <p>¿Deseas pausar esta orden y cambiar su estatus a <strong>Pausada</strong>?</p>
+
+                <input type="hidden" id="PausaID" />
+
+                <textarea id="PausaComentario"
+                          class="form-control"
+                          rows="3"
+                          maxlength="100"
+                          placeholder="Motivo de la pausa (máx. 100 caracteres)">
+                </textarea>
+
+                <small id="PausaCount" class="text-muted">0 / 100</small>
+
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-warning rounded-pill" id="btnConfirmarPausar">Confirmar</button>
+                <button type="button" class="btn btn-warning rounded-pill" id="btnConfirmarPausar">Pausar</button>
                 <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
             </div>
 
@@ -209,13 +244,25 @@
             </div>
 
             <div class="modal-body">
+
                 <p>¿Deseas cancelar esta orden y cambiar su estatus a <strong>Cancelada</strong>?</p>
+
+                <input type="hidden" id="CancelarID" />
+
+                <textarea id="CancelarComentario"
+                          class="form-control"
+                          rows="3"
+                          maxlength="100"
+                          placeholder="Motivo de la cancelación (máx. 100 caracteres)">
+                </textarea>
+
+                <small id="CancelarCount" class="text-muted">0 / 100</small>
+
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger rounded-pill" id="btnConfirmarCancelar">Confirmar</button>
-                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
-    
+                <button type="button" class="btn btn-danger rounded-pill" id="btnConfirmarCancelar">Cancelar orden</button>
+                <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cerrar</button>
             </div>
 
         </div>
@@ -238,6 +285,34 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-success rounded-pill" id="btnConfirmarCerrar">Confirmar</button>
                 <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ComentariosModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @Html.AntiForgeryToken()
+
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title">Agregar comentario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="ComentarioID" />
+
+                <label class="form-label fw-semibold">Comentario (máx. 100 caracteres)</label>
+                <textarea id="ComentarioTexto" class="form-control" rows="3" maxlength="100"></textarea>
+
+                <small id="ComentarioCount" class="text-muted">0 / 100</small>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary rounded-pill" onclick="guardarComentario()">Guardar comentario</button>
+                <button class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancelar</button>
             </div>
 
         </div>
@@ -312,46 +387,140 @@
     </script>
 
     <script>
-        let ordenIdPausar = 0;
+        // let ordenIdPausar = 0;
+
+        // function abrirModalPausar(id) {
+        //     ordenIdPausar = id;
+
+        //     var modal = new bootstrap.Modal(document.getElementById('ModalPausarOrden'));
+        //     modal.show();
+        // }
+
+        // document.getElementById("btnConfirmarPausar").addEventListener("click", function () {
+
+        //     fetch(`/OrdenesMaquinados/PausarOrden/${ordenIdPausar}`, {
+        //         method: "POST"
+        //     })
+        //     .then(response => {
+        //         if (response.ok) {
+        //             window.location.reload();
+        //         }
+        //     });
+        // });
 
         function abrirModalPausar(id) {
-            ordenIdPausar = id;
+            document.getElementById("PausaID").value = id;
+            document.getElementById("PausaComentario").value = "";
+            document.getElementById("PausaCount").textContent = "0 / 100";
 
-            var modal = new bootstrap.Modal(document.getElementById('ModalPausarOrden'));
+            var modal = new bootstrap.Modal(document.getElementById("ModalPausarOrden"));
             modal.show();
         }
 
+        document.getElementById("PausaComentario").addEventListener("input", function () {
+            document.getElementById("PausaCount").textContent = this.value.length + " / 100";
+        });
+
         document.getElementById("btnConfirmarPausar").addEventListener("click", function () {
 
-            fetch(`/OrdenesMaquinados/PausarOrden/${ordenIdPausar}`, {
-                method: "POST"
+            var id = document.getElementById("PausaID").value;
+            var comentario = document.getElementById("PausaComentario").value.trim();
+
+            if (comentario.length === 0) {
+                mostrarToast("Debes escribir un comentario", "warning", "⚠️");
+                return;
+            }
+
+            fetch('/OrdenesMaquinados/PausarConComentario', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({
+                    id: id,
+                    comentario: comentario
+                })
             })
-            .then(response => {
-                if (response.ok) {
-                    window.location.reload();
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+
+                    bootstrap.Modal.getInstance(document.getElementById("ModalPausarOrden")).hide();
+
+                    mostrarToast("Orden pausada", "warning", "⏸️");
+
+                    setTimeout(() => location.reload(), 800);
                 }
             });
         });
     </script>
 
     <script>
-        let ordenIdCancelar = 0;
+        // let ordenIdCancelar = 0;
+
+        // function abrirModalCancelar(id) {
+        //     ordenIdCancelar = id;
+
+        //     var modal = new bootstrap.Modal(document.getElementById('ModalCancelarOrden'));
+        //     modal.show();
+        // }
+
+        // document.getElementById("btnConfirmarCancelar").addEventListener("click", function () {
+
+        //     fetch(`/OrdenesMaquinados/CancelarOrden/${ordenIdCancelar}`, {
+        //         method: "POST"
+        //     })
+        //     .then(response => {
+        //         if (response.ok) {
+        //             window.location.reload();
+        //         }
+        //     });
+        // });
 
         function abrirModalCancelar(id) {
-            ordenIdCancelar = id;
+            document.getElementById("CancelarID").value = id;
+            document.getElementById("CancelarComentario").value = "";
+            document.getElementById("CancelarCount").textContent = "0 / 100";
 
-            var modal = new bootstrap.Modal(document.getElementById('ModalCancelarOrden'));
+            var modal = new bootstrap.Modal(document.getElementById("ModalCancelarOrden"));
             modal.show();
         }
 
+        document.getElementById("CancelarComentario").addEventListener("input", function () {
+            document.getElementById("CancelarCount").textContent = this.value.length + " / 100";
+        });
+
         document.getElementById("btnConfirmarCancelar").addEventListener("click", function () {
 
-            fetch(`/OrdenesMaquinados/CancelarOrden/${ordenIdCancelar}`, {
-                method: "POST"
+            var id = document.getElementById("CancelarID").value;
+            var comentario = document.getElementById("CancelarComentario").value.trim();
+
+            if (comentario.length === 0) {
+                mostrarToast("Debes escribir un comentario", "warning", "⚠️");
+                return;
+            }
+
+            fetch('/OrdenesMaquinados/CancelarOrden', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "RequestVerificationToken": document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({
+                    id: id,
+                    comentario: comentario
+                })
             })
-            .then(response => {
-                if (response.ok) {
-                    window.location.reload();
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+
+                    bootstrap.Modal.getInstance(document.getElementById("ModalCancelarOrden")).hide();
+
+                    mostrarToast("Orden cancelada", "danger", "⛔");
+
+                    setTimeout(() => location.reload(), 800);
                 }
             });
         });
@@ -377,6 +546,108 @@
                     window.location.reload();
                 }
             });
+        });
+    </script>
+
+    <script>
+        function mostrarToast(mensaje, color, icono) {
+            const toast = document.getElementById("OrdenToast");
+            const msg = document.getElementById("ToastMensaje");
+            const ico = document.getElementById("ToastIcon");
+
+            // Cambiar mensaje, color e icono
+            msg.textContent = mensaje;
+            ico.textContent = icono;
+
+            toast.classList.remove("bg-success", "bg-danger", "bg-warning", "bg-primary", "bg-info");
+            toast.classList.add("bg-" + color);
+
+            new bootstrap.Toast(toast).show();
+        }
+    </script>
+
+    <script>
+        function abrirModalComentarios(id) {
+            document.getElementById("ComentarioID").value = id;
+            document.getElementById("ComentarioTexto").value = "";
+            document.getElementById("ComentarioCount").textContent = "0 / 100";
+
+            var modal = new bootstrap.Modal(document.getElementById("ComentariosModal"));
+            modal.show();
+        }
+
+        document.getElementById("ComentarioTexto").addEventListener("input", function () {
+            document.getElementById("ComentarioCount").textContent = this.value.length + " / 100";
+        });
+    </script>
+
+    <script>
+        function guardarComentario() {
+            var id = document.getElementById("ComentarioID").value;
+            var comentario = document.getElementById("ComentarioTexto").value.trim();
+
+            if (comentario.length === 0) {
+                mostrarToast("El comentario no puede estar vacío", "warning", "⚠️");
+                return;
+            }
+
+            fetch('/OrdenesMaquinados/GuardarComentario', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({
+                    id: id,
+                    comentario: comentario
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+
+                    bootstrap.Modal.getInstance(document.getElementById("ComentariosModal")).hide();
+
+                    mostrarToast("Comentario guardado", "info", "💬");
+
+                    setTimeout(() => location.reload(), 800);
+                }
+            });
+        }
+    </script>
+}
+@if (TempData["OrdenTomada"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            mostrarToast("Orden tomada correctamente", "primary", "🛠️");
+        });
+    </script>
+}
+
+@if (TempData["OrdenCerrada"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            mostrarToast("Orden cerrada correctamente", "success", "✔️");
+        });
+    </script>
+}
+
+@if (TempData["OrdenPausada"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            mostrarToast("Orden pausada", "warning", "⏸️");
+        });
+    </script>
+}
+
+@if (TempData["OrdenCancelada"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            mostrarToast("Orden cancelada", "danger", "❌");
         });
     </script>
 }

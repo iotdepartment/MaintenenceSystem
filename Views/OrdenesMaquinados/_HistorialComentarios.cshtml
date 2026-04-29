@@ -1,0 +1,98 @@
+﻿@model MaintenenceSystem.Models.OrdenesMaquinados
+
+<style>
+    .timeline {
+        border-left: 3px solid #0d6efd;
+        margin-left: 20px;
+        padding-left: 20px;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 4px;
+            width: 14px;
+            height: 14px;
+            background-color: #0d6efd;
+            border-radius: 50%;
+        }
+
+    .timeline-icon {
+        font-size: 20px;
+        margin-right: 8px;
+    }
+</style>
+
+<div class="timeline">
+
+    @* ORDEN GENERADA *@
+    @if (Model.FechaInicio != null)
+    {
+        <div class="timeline-item">
+            <span class="timeline-icon">📄</span>
+            <span class="fw-semibold">
+                (@Model.FechaInicio.Value.ToString("dd/MM/yyyy")) Orden generada
+            </span>
+        </div>
+    }
+
+    @* ORDEN ACEPTADA *@
+    @if (Model.FechaAceptacion != null)
+    {
+        <div class="timeline-item">
+            <span class="timeline-icon">✔️</span>
+            <span class="fw-semibold">
+                (@Model.FechaAceptacion.Value.ToString("dd/MM/yyyy")) Orden aceptada
+            </span>
+        </div>
+    }
+
+    @* ORDEN ENTREGADA *@
+    @if (Model.FechaEntrega != null)
+    {
+        <div class="timeline-item">
+            <span class="timeline-icon">📦</span>
+            <span class="fw-semibold">
+                (@Model.FechaEntrega.Value.ToString("dd/MM/yyyy")) Orden entregada
+            </span>
+        </div>
+    }
+
+    @* COMENTARIOS *@
+    @if (!string.IsNullOrEmpty(Model.Comentarios))
+    {
+        var lista = Model.Comentarios.Split(" / ");
+
+        foreach (var c in lista)
+        {
+            string icono = "💬";
+
+            if (c.Contains("Pausad") || c.Contains("⏸"))
+                icono = "⏸️";
+            else if (c.Contains("Cancelad") || c.Contains("❌"))
+                icono = "❌";
+            else if (c.Contains("Cerrad") || c.Contains("✔"))
+                icono = "✔️";
+            else if (c.Contains("Proceso") || c.Contains("🔧"))
+                icono = "🔧";
+            else if (c.Contains("Pendiente") || c.Contains("⏳"))
+                icono = "⏳";
+
+            <div class="timeline-item">
+                <span class="timeline-icon">@icono</span>
+                <span class="fw-semibold">@c</span>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-muted">No hay comentarios registrados.</p>
+    }
+
+</div>

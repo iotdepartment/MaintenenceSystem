@@ -29,3 +29,12 @@ body {
 #OrdenCreadaToast.show {
     transform: translateX(0);
 }
+
+.toast-slide {
+    transform: translateX(150%);
+    transition: transform .4s ease-in-out;
+}
+
+.toast-slide.show {
+    transform: translateX(0);
+}
