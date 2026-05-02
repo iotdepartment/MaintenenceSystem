@@ -387,27 +387,6 @@
     </script>
 
     <script>
-        // let ordenIdPausar = 0;
-
-        // function abrirModalPausar(id) {
-        //     ordenIdPausar = id;
-
-        //     var modal = new bootstrap.Modal(document.getElementById('ModalPausarOrden'));
-        //     modal.show();
-        // }
-
-        // document.getElementById("btnConfirmarPausar").addEventListener("click", function () {
-
-        //     fetch(`/OrdenesMaquinados/PausarOrden/${ordenIdPausar}`, {
-        //         method: "POST"
-        //     })
-        //     .then(response => {
-        //         if (response.ok) {
-        //             window.location.reload();
-        //         }
-        //     });
-        // });
-
         function abrirModalPausar(id) {
             document.getElementById("PausaID").value = id;
             document.getElementById("PausaComentario").value = "";
@@ -457,27 +436,6 @@
     </script>
 
     <script>
-        // let ordenIdCancelar = 0;
-
-        // function abrirModalCancelar(id) {
-        //     ordenIdCancelar = id;
-
-        //     var modal = new bootstrap.Modal(document.getElementById('ModalCancelarOrden'));
-        //     modal.show();
-        // }
-
-        // document.getElementById("btnConfirmarCancelar").addEventListener("click", function () {
-
-        //     fetch(`/OrdenesMaquinados/CancelarOrden/${ordenIdCancelar}`, {
-        //         method: "POST"
-        //     })
-        //     .then(response => {
-        //         if (response.ok) {
-        //             window.location.reload();
-        //         }
-        //     });
-        // });
-
         function abrirModalCancelar(id) {
             document.getElementById("CancelarID").value = id;
             document.getElementById("CancelarComentario").value = "";
