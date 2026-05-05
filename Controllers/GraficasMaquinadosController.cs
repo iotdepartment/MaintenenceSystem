@@ -12,9 +12,27 @@ namespace MaintenenceSystem.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(DateTime? fechaInicio, DateTime? fechaFin)
         {
-            var areas = _context.OrdenesMaquinados
+            // Si no hay fechas, usar el mes actual
+            if (!fechaInicio.HasValue || !fechaFin.HasValue)
+            {
+                var hoy = DateTime.Today;
+                fechaInicio = new DateTime(hoy.Year, hoy.Month, 1); // primer día del mes
+                fechaFin = fechaInicio.Value.AddMonths(1).AddDays(-1); // último día del mes
+            }
+
+            var query = _context.OrdenesMaquinados.AsQueryable();
+
+            // FILTRO POR RANGO DE FECHAS
+            query = query.Where(o =>
+                o.FechaInicio.HasValue &&
+                o.FechaInicio.Value.Date >= fechaInicio.Value.Date &&
+                o.FechaInicio.Value.Date <= fechaFin.Value.Date
+            );
+
+            // GRÁFICA POR ÁREA
+            var areas = query
                 .Where(o => o.Area != null)
                 .GroupBy(o => o.Area)
                 .Select(g => new AreaChartDto
@@ -24,7 +42,8 @@ namespace MaintenenceSystem.Controllers
                 })
                 .ToList();
 
-            var status = _context.OrdenesMaquinados
+            // GRÁFICA POR STATUS
+            var status = query
                 .Where(o => o.Status != null)
                 .GroupBy(o => o.Status)
                 .Select(g => new StatusChartDto
@@ -34,17 +53,18 @@ namespace MaintenenceSystem.Controllers
                 })
                 .ToList();
 
-            // NUEVO: Totales generales
-            var totalGeneradas = _context.OrdenesMaquinados.Count();
-            var totalCerradas = _context.OrdenesMaquinados
-                .Count(o => o.Status == "Cerrada");
+            // GENERADAS Y CERRADAS
+            var totalGeneradas = query.Count();
+            var totalCerradas = query.Count(o => o.Status == "Cerrada");
 
             var vm = new GraficasMaquinadosViewModel
             {
                 Areas = areas,
                 Status = status,
                 TotalGeneradas = totalGeneradas,
-                TotalCerradas = totalCerradas
+                TotalCerradas = totalCerradas,
+                FechaInicio = fechaInicio,
+                FechaFin = fechaFin
             };
 
             return View(vm);

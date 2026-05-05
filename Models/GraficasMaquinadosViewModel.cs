@@ -7,5 +7,8 @@
 
         public int TotalGeneradas { get; set; }
         public int TotalCerradas { get; set; }
+
+        public DateTime? FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
     }
 }

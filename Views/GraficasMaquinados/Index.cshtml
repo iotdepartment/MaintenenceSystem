@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 
 <div class="row mb-4">
-    <div class="col-12">
+    <div class="col-6">
         <div class="card mx-auto shadow-lg bg-secondary border-0 rounded rounded-pill p-3">
             <h3 class="m-0 fw-bold text-light"><i class="bi bi-bar-chart-fill"></i> Graficas Status de Ordenes de Maquinados</h3>
         </div>
@@ -13,34 +13,62 @@
 </div>
 
 <div class="row mb-3">
-    <div class="card shadow-lg rounded-3">
-        <div class="col-2">
-        </div>
+    <div class="card bg-light border border-1 shadow-lg rounded-4 p-3">
+        <form method="get" class="row g-3">
+            <div class="col-auto">
+                <label class="form-label fw-bold">Fecha Inicio</label>
+                <input type="date" name="fechaInicio" class="form-control"
+                       value="@Model.FechaInicio?.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-auto">
+                <label class="form-label fw-bold">Fecha Fin</label>
+                <input type="date" name="fechaFin" class="form-control"
+                       value="@Model.FechaFin?.ToString("yyyy-MM-dd")" />
+            </div>
+
+            <div class="col-auto align-self-end">
+                <button class="btn btn-primary"><i class="bi bi-search"></i> Filtrar</button>
+            </div>
+
+            <div class="col-auto align-self-end">
+                <a href="/GraficasMaquinados/Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 
-<div class="row mb-5">
+<div class="row g-3 mb-5">
     <div class="col-4">
-        <div class="card shadow-lg rounded-3">
-            <div class="card-header bg-primary text-light fw-bold"> Cantidad de Ordenes por area </div>
+        <div class="card shadow-lg rounded-4 border border-1" style="height: 360px;">
+            <div class="card-header bg-primary text-light fw-bold text-center"> Cantidad de Ordenes por area </div>
             <div class="card-body">
-                <canvas id="graficaAreas" height="150"></canvas>
+                <canvas id="graficaAreas"></canvas>
             </div>
         </div>
     </div>
     <div class="col-4">
-        <div class="card shadow-lg rounded-3">
-            <div class="card-header bg-primary text-light fw-bold"> Cantidad de Ordenes por status </div>
+        <div class="card shadow-lg rounded-4 border border-1" style="height: 360px;">
+            <div class="card-header bg-primary text-light fw-bold text-center"> Cantidad de Ordenes por status </div>
             <div class="card-body">
-                <canvas id="graficaStatus" height="150"></canvas>
+                <canvas id="graficaStatus"></canvas>
             </div>
         </div>
     </div>
     <div class="col-4">
-        <div class="card shadow-lg rounded-3">
-            <div class="card-header bg-primary text-light fw-bold"> Cantidad de ordenes generadas vs cerradas </div>
-            <div class="card-body">
-                <canvas id="graficaGeneradasCerradas" height="150"></canvas>
+        <div class="card shadow-lg rounded-4 border border-1" style="height: 360px;">
+            <div class="card-header bg-primary text-light fw-bold text-center">
+                Cantidad de ordenes generadas vs cerradas
+            </div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+
+                <!-- CONTENEDOR QUE CONTROLA EL TAMAÑO -->
+                <div style="max-width: 300px; width: 100%;">
+                    <canvas id="graficaGeneradasCerradas"></canvas>
+                </div>
+
             </div>
         </div>
     </div>
@@ -52,8 +80,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 
     <script>
-        const labels = @Html.Raw(JsonSerializer.Serialize(Model.Areas.Select(x => x.Area)));
-        const data = @Html.Raw(JsonSerializer.Serialize(Model.Areas.Select(x => x.Total)));
+
+        const labels = @Html.Raw(JsonSerializer.Serialize(Model.Areas.OrderByDescending(x => x.Total).Select(x => x.Area)));
+
+        const data = @Html.Raw(JsonSerializer.Serialize(Model.Areas.OrderByDescending(x => x.Total).Select(x => x.Total)));
 
         const ctx = document.getElementById('graficaAreas').getContext('2d');
 
@@ -78,6 +108,11 @@
             },
             options: {
                 responsive: true,
+                layout: {
+                    padding: {
+                        top: 25
+                    }
+                },
                 plugins: {
                     datalabels: {
                         anchor: 'end',
@@ -102,9 +137,36 @@
     </script>
 
     <script>
-        const statusLabels = @Html.Raw(JsonSerializer.Serialize(Model.Status.Select(x => x.Status)));
-        const statusData = @Html.Raw(JsonSerializer.Serialize(Model.Status.Select(x => x.Total)));
+        // ============================
+        //   ORDENAR STATUS DESCENDENTE
+        // ============================
+        const statusOrdenado = @Html.Raw(
+                    JsonSerializer.Serialize(
+                            Model.Status
+                                    .OrderByDescending(x => x.Total)
+                                    .Select(x => new { x.Status, x.Total })
+                    )
+            );
 
+    // Etiquetas ordenadas
+    const statusLabels = statusOrdenado.map(x => x.Status);
+
+        // Valores ordenados
+        const statusData = statusOrdenado.map(x => x.Total);
+
+        // Colores según el status
+        const statusColors = statusOrdenado.map(x =>
+            x.Status === "Pendiente" ? "#6c757d" :      // Gris
+            x.Status === "En proceso" ? "#0d6efd" :     // Azul
+            x.Status === "Pausada" ? "#ffc107" :        // Amarillo
+            x.Status === "Cancelada" ? "#dc3545" :      // Rojo
+            x.Status === "Cerrada" ? "#198754" :        // Verde
+            "#000000"                                   // Default
+        );
+
+        // ============================
+        //   GRAFICA DE STATUS
+        // ============================
         const ctxStatus = document.getElementById('graficaStatus').getContext('2d');
 
         new Chart(ctxStatus, {
@@ -115,19 +177,21 @@
                 datasets: [{
                     label: 'Órdenes por Status',
                     data: statusData,
-                    backgroundColor: [
-                        '#6c757d', // Pendiente
-                        '#0d6efd', // En proceso
-                        '#ffc107', // Pausada
-                        '#dc3545', // Cancelada
-                        '#198754'  // Cerrada
-                    ],
+                    backgroundColor: statusColors,
                     borderRadius: 8,
                     borderWidth: 1
                 }]
             },
             options: {
                 responsive: true,
+
+                // 👇 ESPACIO EXTRA PARA QUE EL NÚMERO DE LA BARRA MÁS ALTA SE VEA
+                layout: {
+                    padding: {
+                        top: 25
+                    }
+                },
+
                 plugins: {
                     datalabels: {
                         anchor: 'end',
@@ -146,19 +210,27 @@
                 }
             }
         });
+
     </script>
 
     <script>
+                // Reducir tamaño al 50%
+        const canvasGC = document.getElementById('graficaGeneradasCerradas');
+
         const gcLabels = ["Generadas", "Cerradas"];
         const gcData = [
             @Model.TotalGeneradas,
             @Model.TotalCerradas
         ];
 
-        const ctxGC = document.getElementById('graficaGeneradasCerradas').getContext('2d');
+        // Calcular porcentajes
+        const totalGC = gcData.reduce((a, b) => a + b, 0);
+        const gcPercent = gcData.map(v => ((v / totalGC) * 100).toFixed(1));
+
+        const ctxGC = canvasGC.getContext('2d');
 
         new Chart(ctxGC, {
-            type: 'bar',
+            type: 'pie',
             plugins: [ChartDataLabels],
             data: {
                 labels: gcLabels,
@@ -169,26 +241,27 @@
                         'rgba(13, 110, 253, 0.8)',   // Generadas
                         'rgba(25, 135, 84, 0.8)'     // Cerradas
                     ],
-                    borderRadius: 8,
-                    borderWidth: 1
+                    borderColor: "#fff",
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: true,
                 plugins: {
                     datalabels: {
-                        anchor: 'end',
-                        align: 'top',
-                        color: '#000',
-                        font: { weight: 'bold', size: 14 },
-                        formatter: (value) => value
+                        color: "#fff",
+                        font: { weight: "bold", size: 16 },
+                        formatter: (value, ctx) => {
+                            const i = ctx.dataIndex;
+                            return `${value} (${gcPercent[i]}%)`;
+                        }
                     },
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1 }
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            font: { size: 14, weight: "bold" }
+                        }
                     }
                 }
             }
