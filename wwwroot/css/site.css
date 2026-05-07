@@ -38,3 +38,26 @@ body {
 .toast-slide.show {
     transform: translateX(0);
 }
+
+.body-gradient {
+    background: linear-gradient(135deg, rgb(35, 74, 143), rgb(216, 104, 99), rgb(233, 236, 239), rgb(35, 74, 143) );
+    background-size: 400% 400%;
+    animation: gradientMove 14s ease infinite;
+    min-height: 100vh;
+    background-attachment: fixed;
+}
+
+/* Animación suave del gradiente */
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}

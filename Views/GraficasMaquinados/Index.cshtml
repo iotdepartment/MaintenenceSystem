@@ -42,33 +42,34 @@
 
 <div class="row g-3 mb-5">
     <div class="col-4">
-        <div class="card shadow-lg rounded-4 border border-1" style="height: 360px;">
+        <div class="card shadow-lg rounded-4 border border-1" style="height: 500px;">
             <div class="card-header bg-primary text-light fw-bold text-center"> Cantidad de Ordenes por area </div>
-            <div class="card-body">
-                <canvas id="graficaAreas"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-4">
-        <div class="card shadow-lg rounded-4 border border-1" style="height: 360px;">
-            <div class="card-header bg-primary text-light fw-bold text-center"> Cantidad de Ordenes por status </div>
-            <div class="card-body">
-                <canvas id="graficaStatus"></canvas>
-            </div>
-        </div>
-    </div>
-    <div class="col-4">
-        <div class="card shadow-lg rounded-4 border border-1" style="height: 360px;">
-            <div class="card-header bg-primary text-light fw-bold text-center">
-                Cantidad de ordenes generadas vs cerradas
-            </div>
             <div class="card-body d-flex justify-content-center align-items-center">
+                <div style="max-width: 750px; width: 100%;">
+                    <canvas id="graficaAreas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- CONTENEDOR QUE CONTROLA EL TAMAÑO -->
-                <div style="max-width: 300px; width: 100%;">
+    <div class="col-4">
+        <div class="card shadow-lg rounded-4 border border-1" style="height: 500px;">
+            <div class="card-header bg-primary text-light fw-bold text-center"> Cantidad de Ordenes por status </div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <div style="max-width: 750px; width: 100%;">
+                <canvas id="graficaStatus"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4">
+        <div class="card shadow-lg rounded-4 border border-1" style="height: 500px;">
+            <div class="card-header bg-primary text-light fw-bold text-center">Cantidad de ordenes generadas vs cerradas</div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <div style="max-width: 420px; width: 100%;">
                     <canvas id="graficaGeneradasCerradas"></canvas>
                 </div>
-
             </div>
         </div>
     </div>
